@@ -57,7 +57,7 @@ with st.sidebar.expander("Add Expense"):
     amount = st.number_input("Amount", min_value=0.0, format="%.2f")
     date = st.date_input("Date", value=datetime.now().date())
     if st.button("Add Expense"):
-        add_expense(category, amount, date.strftime("%Y-%m-%d"))
+        add_expense(category, amount, date.strftime("%m-%d-%Y"))
         st.success("Expense added!")
 
 # Update/Delete Expense
