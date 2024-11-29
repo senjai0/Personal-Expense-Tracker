@@ -134,7 +134,7 @@ st.sidebar.header("Expense Management")
 
 # Add Expense
 with st.sidebar.expander("Add Expense"):
-    category = st.text_input("Category", placeholder("eg. Bills, Accessories, .....)
+    category = st.text_input("Category", placeholder("eg. Bills, Accessories, .....))
     amount = st.number_input("Amount", min_value=0.0, format="%.2f")
     date = st.date_input("Date", value=datetime.now().date())
     if st.button("Add Expense"):
