@@ -65,10 +65,10 @@ def delete_expense(id):
     """Delete an expense from the database and return it."""
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM expenses WHERE id = ?", (id, ))
+    cursor.execute("SELECT * FROM expenses WHERE id = ?", (id,))
     deleted_expense = cursor.fetchone()
     if deleted_expense:
-        cursor.execute("DELETE FROM expenses WHERE id = ?", (id, ))
+        cursor.execute("DELETE FROM expenses WHERE id = ?", (id,))
         conn.commit()
     conn.close()
     return deleted_expense
@@ -79,7 +79,7 @@ def search_expenses(query):
     conn = create_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM expenses WHERE category LIKE ?",
-                   ('%' + query + '%', ))
+                   ('%' + query + '%',))
     expenses = cursor.fetchall()
     conn.close()
     return expenses
@@ -96,6 +96,18 @@ def sort_expenses(by, reverse=False):
     return expenses
 
 
+def get_total_expenses():
+    """Calculate the total expenses per category and overall."""
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT category, SUM(amount) FROM expenses GROUP BY category")
+    total_expenses_per_category = cursor.fetchall()
+    cursor.execute("SELECT SUM(amount) FROM expenses")
+    total_expenses = cursor.fetchone()[0] or 0
+    conn.close()
+    return total_expenses_per_category, total_expenses
+
+
 # 2. Streamlit UI Helper Functions
 def display_expenses(expenses):
     """Helper function to display expenses as a table."""
@@ -105,16 +117,15 @@ def display_expenses(expenses):
     st.table(df)
 
 
-def display_deleted_expenses():
-    """Display deleted expenses history."""
-    if st.session_state["deleted_expenses"]:
-        deleted_df = pd.DataFrame(st.session_state["deleted_expenses"],
-                                  columns=["ID", "Category", "Amount", "Date"])
-        deleted_df["Amount"] = deleted_df["Amount"].apply(
-            lambda x: round(x, 2))
-        st.table(deleted_df)
-    else:
-        st.write("No deleted expenses.")
+def display_total_expenses(total_expenses_per_category, total_expenses):
+    """Display total expenses per category and overall."""
+    st.header("Total Expenses")
+    st.write(f"**Overall Total Expenses**: ${round(total_expenses, 2)}")
+
+    st.subheader("Expenses per Category")
+    total_df = pd.DataFrame(total_expenses_per_category, columns=["Category", "Total Amount"])
+    total_df["Total Amount"] = total_df["Total Amount"].apply(lambda x: round(x, 2))
+    st.table(total_df)
 
 
 # 3. Main Streamlit Application
@@ -134,14 +145,24 @@ st.sidebar.header("Expense Management")
 
 # Add Expense
 with st.sidebar.expander("Add Expense"):
-    category = st.text_input("Category")
+    # Predefined categories
+    categories = ["Food", "Transportation Fare", "House Rent", "Clothing"]
+    category = st.selectbox("Category", categories)
+    
     amount = st.number_input("Amount", min_value=0.0, format="%.2f")
     date = st.date_input("Date", value=datetime.now().date())
-    if st.button("Add Expense"):
-        add_expense(category, amount, date.strftime("%Y-%m-%d"))
-        st.success("Expense added!")
 
-# Update/Delete Expense
+    if category == "":
+        st.error("Please select a category.")
+    
+    if st.button("Add Expense"):
+        if category and amount > 0:
+            add_expense(category, amount, date.strftime("%Y-%m-%d"))
+            st.success("Expense added!")
+        else:
+            st.error("Please fill in all fields correctly.")
+
+# Show Expenses
 st.header("Expenses")
 expenses = get_expenses()
 if expenses:
@@ -209,3 +230,7 @@ if st.button("Sort"):
                                     reverse=(order == "Descending"))
     display_expenses(sorted_expenses)
     st.success("Expenses sorted!")
+
+# Display Total Expenses
+total_expenses_per_category, total_expenses = get_total_expenses()
+display_total_expenses(total_expenses_per_category, total_expenses)
