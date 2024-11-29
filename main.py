@@ -164,15 +164,19 @@ with st.sidebar.expander("Add Expense"):
     amount = st.number_input("Amount", min_value=0.0, format="%.2f")
     date = st.date_input("Date", value=datetime.now().date())
 
+    # Validate inputs before adding the expense
     if category == "":
-        st.error("Please select a category.")
+        st.error("Please select a category.")  # Show error if no category is selected
     
     if st.button("Add Expense"):
         if category and amount > 0:
             add_expense(category, amount, date.strftime("%Y-%m-%d"))
             st.success("Expense added!")
         else:
-            st.error("Please fill in all fields correctly.")
+            if not category:
+                st.error("Please select a valid category.")
+            if amount <= 0:
+                st.error("Please enter a valid amount greater than 0.")
 
 # Show Expenses
 st.header("Expenses")
