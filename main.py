@@ -140,6 +140,9 @@ with st.sidebar.expander("Add Expense"):
     if st.button("Add Expense"):
         add_expense(category, amount, date.strftime("%Y-%m-%d"))
         st.success("Expense added!")
+    else st.button("Add Expense"):
+        add_expense(category, amount, date.strftime("%Y-%m-%d"))
+        st.success("Invalid!")
 
 # Update/Delete Expense
 st.header("Expenses")
