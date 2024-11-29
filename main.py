@@ -3,7 +3,6 @@ import sqlite3
 import pandas as pd
 from datetime import datetime
 
-
 # 1. Database Helper Functions
 def create_connection():
     """Create and return a database connection."""
@@ -137,9 +136,18 @@ with st.sidebar.expander("Add Expense"):
     category = st.text_input("Category")
     amount = st.number_input("Amount", min_value=0.0, format="%.2f")
     date = st.date_input("Date", value=datetime.now().date())
+
+    # Validate the date (can't be in the future)
+    if date > datetime.now().date():
+        st.error("The selected date cannot be in the future. Please choose a valid date.")
+    
     if st.button("Add Expense"):
-        add_expense(category, amount, date.strftime("%Y-%m-%d"))
-        st.success("Expense added!")
+        # Ensure date validation passed before adding expense
+        if date <= datetime.now().date():
+            add_expense(category, amount, date.strftime("%Y-%m-%d"))
+            st.success("Expense added!")
+        else:
+            st.error("The selected date is invalid. Please choose a valid date.")
 
 # Update/Delete Expense
 st.header("Expenses")
