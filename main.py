@@ -141,14 +141,20 @@ with st.sidebar.expander("Add Expense"):
     if date > datetime.now().date():
         st.error("The selected date cannot be in the future. Please choose a valid date.")
     
+    # Try to catch invalid date input, like "February 30th"
+    try:
+        # This will raise a ValueError if an invalid date is provided (though the date picker ensures valid input)
+        datetime.strptime(str(date), "%Y-%m-%d")
+    except ValueError:
+        st.error("The selected date is invalid. Please choose a valid date (e.g., February 28th).")
+    
+    # Only allow adding the expense if date validation passed
     if st.button("Add Expense"):
-        # Ensure date validation passed before adding expense
         if date <= datetime.now().date():
             add_expense(category, amount, date.strftime("%Y-%m-%d"))
             st.success("Expense added!")
         else:
             st.error("The selected date is invalid. Please choose a valid date.")
-
 # Update/Delete Expense
 st.header("Expenses")
 expenses = get_expenses()
