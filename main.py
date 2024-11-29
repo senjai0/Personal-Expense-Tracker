@@ -117,6 +117,18 @@ def display_expenses(expenses):
     st.table(df)
 
 
+def display_deleted_expenses():
+    """Display deleted expenses history."""
+    if st.session_state["deleted_expenses"]:
+        deleted_df = pd.DataFrame(st.session_state["deleted_expenses"],
+                                  columns=["ID", "Category", "Amount", "Date"])
+        deleted_df["Amount"] = deleted_df["Amount"].apply(
+            lambda x: round(x, 2))
+        st.table(deleted_df)
+    else:
+        st.write("No deleted expenses.")
+
+
 def display_total_expenses(total_expenses_per_category, total_expenses):
     """Display total expenses per category and overall."""
     st.header("Total Expenses")
