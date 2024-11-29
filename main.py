@@ -120,7 +120,7 @@ def display_expenses(expenses):
 def display_total_expenses(total_expenses_per_category, total_expenses):
     """Display total expenses per category and overall."""
     st.header("Total Expenses")
-    st.write(f"**Overall Total Expenses**: ${round(total_expenses, 2)}")
+    st.write(f"**Overall Total Expenses**: ₱{round(total_expenses, 2)}")
 
     st.subheader("Expenses per Category")
     total_df = pd.DataFrame(total_expenses_per_category, columns=["Category", "Total Amount"])
