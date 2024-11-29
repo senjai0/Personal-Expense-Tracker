@@ -3,6 +3,7 @@ import sqlite3
 import pandas as pd
 from datetime import datetime
 
+
 # 1. Database Helper Functions
 def create_connection():
     """Create and return a database connection."""
@@ -136,25 +137,10 @@ with st.sidebar.expander("Add Expense"):
     category = st.text_input("Category")
     amount = st.number_input("Amount", min_value=0.0, format="%.2f")
     date = st.date_input("Date", value=datetime.now().date())
-
-    # Validate the date (can't be in the future)
-    if date > datetime.now().date():
-        st.error("The selected date cannot be in the future. Please choose a valid date.")
-    
-    # Try to catch invalid date input, like "February 30th"
-    try:
-        # This will raise a ValueError if an invalid date is provided (though the date picker ensures valid input)
-        datetime.strptime(str(date), "%Y-%m-%d")
-    except ValueError:
-        st.error("The selected date is invalid. Please choose a valid date (e.g., February 28th).")
-    
-    # Only allow adding the expense if date validation passed
     if st.button("Add Expense"):
-        if date <= datetime.now().date():
-            add_expense(category, amount, date.strftime("%Y-%m-%d"))
-            st.success("Expense added!")
-        else:
-            st.error("The selected date is invalid. Please choose a valid date.")
+        add_expense(category, amount, date.strftime("%Y-%m-%d"))
+        st.success("Expense added!")
+
 # Update/Delete Expense
 st.header("Expenses")
 expenses = get_expenses()
